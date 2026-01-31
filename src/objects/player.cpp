@@ -1,6 +1,7 @@
 #include "player.h"
 #include "../appconfig.h"
 #include <iostream>
+#include <SDL2/SDL_mixer.h>
 
 Player::Player(double x, double y, SpriteType type, std::vector<KeyCode> control_keys)
     : Tank(x, y, type)
@@ -18,8 +19,18 @@ Player::Player(double x, double y, SpriteType type, std::vector<KeyCode> control
     m_key_state_left = {control_keys[2], false};
     m_key_state_right = {control_keys[3], false};
     m_key_state_fire = {control_keys[4], false};
+    m_tankProjectile = Mix_LoadWAV("sounds/shot.wav");
 
     moveToCreatingState();
+}
+
+Player::~Player()
+{
+    if (m_tankProjectile)
+    {
+        Mix_FreeChunk(m_tankProjectile);
+        m_tankProjectile = nullptr;
+    }
 }
 
 void Player::handleKeyboardEvent(const KeyboardEvent &ev)
@@ -140,6 +151,7 @@ Bullet *Player::fire()
 {
     Bullet *b = Tank::fire();
     if (b != nullptr)
+        Mix_PlayChannel(-1, m_tankProjectile, 0);
     {
         if (star_count > 0)
             b->increaseSpeed(1.3);

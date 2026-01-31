@@ -10,8 +10,8 @@ ifeq ($(OS),Windows_NT)
 	INCLUDEPATH = -I$(RESOURCES_DIR)/SDL/i686-w64-mingw32/include
 	LFLAGS = -mwindows -O
 	CFLAGS = -c -Wall
-	LIBS = -L$(RESOURCES_DIR)/SDL/i686-w64-mingw32/lib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf
-	APP_RESOURCES = SDL/i686-w64-mingw32/bin/*.dll dll/*.dll font/prstartk.ttf png/texture.png levels
+	LIBS = -L$(RESOURCES_DIR)/SDL/i686-w64-mingw32/lib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer
+	APP_RESOURCES = SDL/i686-w64-mingw32/bin/*.dll dll/*.dll font/prstartk.ttf png/texture.png levels sounds
 	RESOURCES = $(APP_RESOURCES) mingw_resources
 else
 	UNAME_S := $(shell uname -s)
@@ -31,16 +31,16 @@ else
 		endif
 		LFLAGS = -O
 		CFLAGS = -c -Wall -Wno-narrowing -std=c++11
-		LIBS = -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf
-		APP_RESOURCES = font/prstartk.ttf png/texture.png levels
+		LIBS = -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer
+		APP_RESOURCES = font/prstartk.ttf png/texture.png levels sounds
 		RESOURCES = $(APP_RESOURCES)
 	else
 		CC = g++
 		INCLUDEPATH =
 		LFLAGS = -O
 		CFLAGS = -c -Wall -Wno-narrowing -std=c++11
-		LIBS = -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf
-		APP_RESOURCES = font/prstartk.ttf png/texture.png levels
+		LIBS = -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer
+		APP_RESOURCES = font/prstartk.ttf png/texture.png levels sounds
 		RESOURCES = $(APP_RESOURCES)
 	endif
 endif

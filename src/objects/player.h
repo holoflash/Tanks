@@ -3,6 +3,7 @@
 
 #include "tank.h"
 #include <vector>
+#include <SDL2/SDL_mixer.h>
 
 class Player : public Tank
 {
@@ -11,7 +12,8 @@ public:
 
     void handleKeyboardEvent(const KeyboardEvent &ev);
     void update(Uint32 dt) override;
-    
+    virtual ~Player();
+
     void respawn() override;
     void hit();
     void moveToNextLevel();
@@ -26,6 +28,7 @@ public:
 
     void addLife();
     unsigned lives() const;
+    Mix_Chunk *m_tankProjectile = NULL;
 
 private:
     void resetKeyStates();

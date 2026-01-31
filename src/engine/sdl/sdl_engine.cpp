@@ -6,6 +6,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
 #include <iostream>
 
 SDLEngine::~SDLEngine()
@@ -27,7 +28,7 @@ void SDLEngine::startMainLoop(HandleEventFunc handleEvent, UpdateStateFunc updat
 {
     is_main_loop_running = true;
 
-    if (SDL_Init(SDL_INIT_VIDEO) == 0)
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) == 0)
     {
         m_window = SDL_CreateWindow(m_config.window_title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                                     m_config.initial_window_size.w, m_config.initial_window_size.h, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
@@ -39,6 +40,11 @@ void SDLEngine::startMainLoop(HandleEventFunc handleEvent, UpdateStateFunc updat
             return;
         if (TTF_Init() == -1)
             return;
+
+        if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+        {
+            return;
+        }
 
         std::random_device dev;
         srand(dev());
@@ -97,6 +103,7 @@ void SDLEngine::startMainLoop(HandleEventFunc handleEvent, UpdateStateFunc updat
         m_window = nullptr;
         TTF_Quit();
         IMG_Quit();
+        Mix_CloseAudio();
         SDL_Quit();
     }
 }
@@ -106,7 +113,7 @@ ProcessingResult SDLEngine::handleEvents(HandleEventFunc handleEvent)
     SDL_Event event;
     while (SDL_PollEvent(&event))
     {
-        Event* e = mapSDLEventToEngineEvent(event);
+        Event *e = mapSDLEventToEngineEvent(event);
         if (event.type == SDL_QUIT)
         {
             return ProcessingResult::STOP;
@@ -128,11 +135,11 @@ ProcessingResult SDLEngine::handleEvents(HandleEventFunc handleEvent)
     return ProcessingResult::CONTINUE;
 }
 
-ProcessingResult SDLEngine::handleInternalEvents(const Event& event)
+ProcessingResult SDLEngine::handleInternalEvents(const Event &event)
 {
     if (event.type() == Event::WINDOW)
     {
-        const WindowEvent& we = static_cast<const WindowEvent &>(event);
+        const WindowEvent &we = static_cast<const WindowEvent &>(event);
         if (we.windowEventType() == WindowEvent::RESIZED ||
             we.windowEventType() == WindowEvent::MAXIMIZED ||
             we.windowEventType() == WindowEvent::RESTORED ||
@@ -143,7 +150,7 @@ ProcessingResult SDLEngine::handleInternalEvents(const Event& event)
     }
     else if (event.type() == Event::KEYBOARD)
     {
-        const KeyboardEvent& ke = static_cast<const KeyboardEvent &>(event);
+        const KeyboardEvent &ke = static_cast<const KeyboardEvent &>(event);
         if (ke.isPressed(KeyCode::KEY_F11))
         {
             m_renderer->toggleFullscreen(m_window);
